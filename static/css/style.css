@@ -6,7 +6,8 @@
 
 :root {
     --ink: #1c1917;
-    --paper: #faf6f0;
+    --paper: #FFEED5;
+    --white-paper: #faf6f0;
     --accent: #d95d39;
     --accent-dark: #a8442a;
     --line: #e3d9c9;
@@ -21,7 +22,12 @@ body {
     line-height: 1.6;
 }
 
-h1, .brand {
+h1 {
+    font-family: "Montserrat", -apple-system, sans-serif;
+    font-weight: 800;
+}
+
+.brand {
     font-family: "Space Grotesk", -apple-system, sans-serif;
 }
 
@@ -34,6 +40,7 @@ h1, .brand {
 /* header with Flexbox */
 .site-header {
     border-bottom: 1px solid var(--line);
+    background-color: var(--white-paper);
 }
 
 .site-header .container {
