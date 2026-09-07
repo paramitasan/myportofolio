@@ -139,7 +139,7 @@ h1 {
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
-    color: var(--paper);
+    color: var(--white-paper);
     background-color: var(--ink);
     border-radius: var(--radius);
     padding: 0.5rem 1.1rem;
@@ -178,7 +178,85 @@ h1 {
     border: 3px solid var(--ink);
 }
 
-/* footer and responsiveness */
+/* "my skills" section */
+.skills {
+    padding-bottom: 4rem;
+}
+
+.skills-grid {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.skills-grid h2 {
+    font-family: "Montserrat", sans-serif;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 900;
+    color: var(--accent-dark);
+    margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+}
+
+.skill-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.skill-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius);
+    border: 2px solid var(--ink);
+    overflow: hidden;
+    cursor: pointer;
+    outline: none;
+}
+
+.skill-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.skills-overlay {
+    /* animation when hovering: dark square */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(57, 27, 17, 0.75);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.skills-overlay span {
+    /* animation when hovering: text */
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.skill-item:hover .skills-overlay,
+.skill-item:focus .skills-overlay,
+.skill-item:active .skills-overlay {
+    /* animation when hovering in action */
+    opacity: 1;
+}
+
+/* footer */
 .site-footer {
     padding: 1.5rem;
     color: var(--text-muted);
@@ -186,6 +264,7 @@ h1 {
     border-top: 1px solid var(--line);
 }
 
+/* responsiveness */
 @media (max-width: 600px) {
     .hero-grid {
         grid-template-columns: 1fr;
@@ -196,6 +275,10 @@ h1 {
     }
 
     .hero-photo {
+        max-width: 220px;
+    }
+
+    .skill-items {
         max-width: 220px;
     }
 
