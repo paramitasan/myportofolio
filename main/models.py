@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
@@ -20,7 +21,7 @@ class Experience(models.Model):
         default="full-time",
     )
     thumbnail = models.URLField(blank=True, null=True)
-    started_at = models.DateTimeField(auto_now_add=True, null=True)
+    started_at = models.DateTimeField(blank=True, null=True)
     ended_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
@@ -29,3 +30,16 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class Education(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution_name = models.CharField(max_length=255)
+    starting_year = models.PositiveIntegerField(
+        blank=True, null=True,
+        validators=[MinValueValidator(2010),MaxValueValidator(2100)]
+    )
+    end_year = models.PositiveIntegerField(
+        blank=True, null=True,
+        validators=[MinValueValidator(2010),MaxValueValidator(2100)]
+    )
+    description = models.TextField(max_length=400, default="")

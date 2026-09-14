@@ -256,8 +256,9 @@ h1 {
     opacity: 1;
 }
 
-/* experience */
-.experience-section {
+/* experience, education */
+.experience-section,
+.education-section {
     padding: 4rem 0;
     border-top: 1px solid var(--line);
 }
@@ -270,18 +271,21 @@ h1 {
     text-transform: uppercase;
 }
 
-.experience-section h1 {
+.experience-section h1,
+.education-section h1 {
     margin: 0.4rem 0 1.5rem;
     font-size: 2rem;
 }
 
-.experience-grid {
+.experience-grid,
+.education-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1rem;
 }
 
-.experience-card {
+.experience-card,
+.education-card {
     padding: 1.25rem;
     background-color: #fff;
     border: 1px solid var(--line);
@@ -295,14 +299,23 @@ h1 {
     text-transform: uppercase;
 }
 
-.experience-card h2 {
+.education-year {
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.experience-card h2,
+.education-card h2 {
     margin: 0.5rem 0;
     font-size: 1.25rem;
 }
 
 .experience-description,
+.education-description,
 .empty-state {
     color: var(--text-muted);
+    margin: 1rem 0 0;
 }
 
 .experience-status {
