@@ -1,6 +1,9 @@
-from django.shortcuts import render
-from main.models import Experience
-from main.models import Education
+from django.shortcuts import get_object_or_404, redirect, render
+from main.models import Experience, Education
+from django.contrib import messages
+from django.core import serializers
+from django.http import HttpResponse
+from main.forms import EducationForm
 
 def show_main(request):
     context = {
@@ -26,8 +29,42 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_education(request):
+    json_response = get_education_json(request)
+
+    education = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    education = [edu.object for edu in education]
+    institution_name_query = request.GET.get("institution_name", "").strip()
+
     context = {
         "name": "Paramita",
-        "education_list": Education.objects.all(),
+        "education_list": education,
+        "institution_name_query": institution_name_query,
     }
     return render(request, "education.html", context)
+
+def create_education(request):
+    form = EducationForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "New education record has successfully been added!")
+        return redirect("main:show_education")
+
+    context = {
+        "name": "Paramita",
+        "form": form,
+    }
+    return render(request, "education_form.html", context)
+
+def get_education_json(request):
+    edu = Education.objects.all()
+    institution_name_query = request.GET.get("institution_name", "").strip()
+
+    if institution_name_query:
+        edu = edu.filter(institution_name__icontains=institution_name_query)
+
+    edu_json = serializers.serialize("json", edu)
+    return HttpResponse(edu_json, content_type="application/json")

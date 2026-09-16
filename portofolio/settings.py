@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "main",
 ]
 
+CRSF_TRUSTED_ORIGINS = ["https://paramita-santoso-myportofolio.pws.cs.ui.ac.id"]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
