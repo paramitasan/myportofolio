@@ -31,9 +31,10 @@ SECRET_KEY = 'django-insecure--4)obn##%zq@2-2g%39jl_jpjbls_u8nou73ygx)po&lwg-rc1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# security for deleting and adding things
+SECRET_PASSCODE = os.getenv("SECRET_PASSCODE", "fallback_secret")
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

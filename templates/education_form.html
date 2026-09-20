@@ -11,6 +11,7 @@
                       action="{% url 'main:create_education' %}"
                       class="education-form">
                     {% csrf_token %}
+
                     {% for field in form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -20,6 +21,16 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
+                    
+                    <div class="form-group">
+                        <label for="passcode">Admin Passcode</label>
+                        <input type="password" 
+                               id="passcode" 
+                               name="passcode" 
+                               placeholder="Enter admin passcode to save" 
+                               required>
+                    </div>
+
                     <button type="submit" class="button">Add Record</button>
                     <a href="{% url 'main:show_education' %}" class="button button-secondary">Cancel</a>
                 </form>

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
 from main.forms import EducationForm
+from portofolio import settings
 
 def show_main(request):
     context = {
@@ -48,10 +49,20 @@ def show_education(request):
 def create_education(request):
     form = EducationForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "New education record has successfully been added!")
-        return redirect("main:show_education")
+    if request.method == "POST":
+        user_passcode = request.POST.get("passcode", "")
+        if user_passcode != settings.SECRET_PASSCODE:
+            messages.error(request, "Incorrect passcode: no authority to add education records.")
+            context = {
+                "name": "Paramita",
+                "form": form,
+            }
+            return render(request, "education_form.html", context)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Education record has successfully been added!")
+            return redirect("main:show_education")
 
     context = {
         "name": "Paramita",
@@ -73,8 +84,12 @@ def delete_education(request, edu_id):
     edu = get_object_or_404(Education, pk=edu_id)
 
     if request.method == "POST":
-        edu.delete()
-        messages.success(request, "Education record has successfully been deleted.")
+        user_passcode = request.POST.get("passcode", "")
+        if user_passcode == settings.SECRET_PASSCODE:
+            edu.delete()
+            messages.success(request, "Education record has successfully been deleted.")
+        else:
+            messages.error(request, "Incorrect passcode: no authority to delete education records.")
         return redirect("main:show_education")
 
     return redirect("main:show_education")
