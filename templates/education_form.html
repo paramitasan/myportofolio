@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block meta %}
-    <title>Add Education - {{ name }}</title>
+    <title> {% if is_edit %} Edit Education
+            {% else %} Add Education
+            {% endif %} - {{ name }} </title>
 {% endblock meta %}
 {% block content %}
     <main>
