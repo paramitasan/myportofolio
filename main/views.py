@@ -67,6 +67,34 @@ def create_education(request):
     context = {
         "name": "Paramita",
         "form": form,
+        "is_edit": False,  #To differentiate between [create] & edit
+    }
+    return render(request, "education_form.html", context)
+
+def edit_education(request, edu_id):
+    edu = get_object_or_404(Education, pk=edu_id)
+    form = EducationForm(request.POST or None, instance=edu)
+
+    if request.method == "POST":
+        user_passcode = request.POST.get("passcode", "")
+        if user_passcode != settings.SECRET_PASSCODE:
+            messages.error(request, "Incorrect passcode: no authority to edit education records.")
+            context = {
+                "name": "Paramita",
+                "form": form,
+                "is_edit": True,
+            }
+            return render(request, "education_form.html", context)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Education record has successfully been updated!")
+            return redirect("main:show_education")
+
+    context = {
+        "name": "Paramita",
+        "form": form,
+        "is_edit": True,  # To differentiate between create & [edit]
     }
     return render(request, "education_form.html", context)
 

@@ -46,6 +46,10 @@
                             </p>
                             <div class="education-card-actions">
                                 <div class="education-actions">
+                                    <a href="{% url 'main:edit_education' edu.id %}" 
+                                       class="button button-secondary">
+                                        Edit
+                                    </a>
                                     {% include "education_delete_modal.html" with education=edu %}
                                 </div>
                             </div>

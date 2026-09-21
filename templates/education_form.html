@@ -6,9 +6,10 @@
     <main>
         <section class="experience-section">
             <div class="container">
-                <h1>Add Education Record</h1>
+                <h1> {% if is_edit %} Edit Education Record
+                     {% else %} Add Education Record
+                     {% endif %} </h1>
                 <form method="post"
-                      action="{% url 'main:create_education' %}"
                       class="education-form">
                     {% csrf_token %}
 
@@ -31,7 +32,9 @@
                                required>
                     </div>
 
-                    <button type="submit" class="button">Add Record</button>
+                    <button type="submit" class="button"> {% if is_edit %} Edit record
+                                                          {% else %} Add record
+                                                          {% endif %} </button>
                     <a href="{% url 'main:show_education' %}" class="button button-secondary">Cancel</a>
                 </form>
             </div>
