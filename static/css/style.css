@@ -327,6 +327,8 @@ h1 {
 
 .experience-card,
 .education-card {
+    display: flex;
+    flex-direction: column;
     padding: 1.25rem;
     background-color: #fff;
     border: 1px solid var(--line);
@@ -357,6 +359,7 @@ h1 {
 .empty-state {
     color: var(--text-muted);
     margin: 1rem 0 0;
+    overflow-wrap: break-word;
 }
 
 .experience-status {
@@ -373,6 +376,7 @@ h1 {
 }
 
 .form-group {
+    margin-top: 1 rem;
     margin-bottom: 1.25rem;
 }
 
