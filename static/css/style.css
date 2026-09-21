@@ -28,6 +28,10 @@ h1 {
 }
 
 .brand {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
     font-family: "Space Grotesk", -apple-system, sans-serif;
 }
 
@@ -48,13 +52,6 @@ h1 {
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 1.5rem;
-}
-
-.brand {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--ink);
-    text-decoration: none;
 }
 
 .site-header nav {
@@ -284,34 +281,6 @@ h1 {
     margin-bottom: 0;
 }
 
-.education-add-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-}
-
-.education-add-button span {
-    font-size: 1.25rem;
-    line-height: 1;
-}
-
-.education-search {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
-
-.education-search__input {
-    width: 100%;
-    min-width: 0;
-    padding: 0.7rem;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: #fff;
-    color: var(--ink);
-    font: inherit;
-}
-
 .experience-section h1,
 .education-section h1 {
     margin: 0.4rem 0 1.5rem;
@@ -368,15 +337,16 @@ h1 {
     font-weight: 600;
 }
 
-/* education form */
-.education-form {
+/* form */
+.education-form,
+.experience-form {
     width: 100%;
     max-width: 100%;
     margin-top: 1.5rem;
 }
 
 .form-group {
-    margin-top: 1 rem;
+    margin-top: 1rem;
     margin-bottom: 1.25rem;
 }
 
@@ -387,7 +357,8 @@ h1 {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
     box-sizing: border-box;
     padding: 0.7rem;
@@ -400,7 +371,8 @@ h1 {
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
     outline: 2px solid var(--accent);
     border-color: var(--accent);
 }
@@ -429,8 +401,9 @@ h1 {
     background: var(--ink);
 }
 
-/* education add, search */
-.education-header {
+/* education & experience add, search */
+.education-header,
+.experience-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -439,24 +412,28 @@ h1 {
     margin-bottom: 1.5rem;
 }
 
-.education-add-button {
+.education-add-button,
+.experience-add-button {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
 }
 
-.education-add-button span {
+.education-add-button span,
+.experience-add-button span {
     font-size: 1.25rem;
     line-height: 1;
 }
 
-.education-search {
+.education-search,
+.experience-search {
     display: flex;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
-.education-search__input {
+.education-search__input,
+.experience-search__input {
     width: 100%;
     min-width: 0;
     padding: 0.7rem;
@@ -467,13 +444,15 @@ h1 {
     font: inherit;
 }
 
-.education-search__input:focus {
+.education-search__input:focus,
+.experience-search__input:focus {
     outline: 2px solid var(--accent);
     border-color: var(--accent);
 }
 
-/* education modal */
-.education-actions {
+/* education & experience modal */
+.education-actions,
+.experience-actions {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -481,12 +460,14 @@ h1 {
     margin-top: 1rem;
 }
 
-.education-actions .button {
+.education-actions .button,
+.experience-actions .button {
     font-size: 0.85rem;
     font-weight: 600;
 }
 
-.education-card-actions {
+.education-card-actions,
+.experience-card-actions {
     display: flex;
     flex-direction: column;
     margin-top: auto;
@@ -496,11 +477,13 @@ h1 {
     display: none !important;
 }
 
-.education-actions .experience-status {
+.education-actions .experience-status,
+.experience-actions .experience-status {
     margin-top: 0;
 }
 
-.education-delete-modal {
+.education-delete-modal,
+.experience-delete-modal {
     display: none;
     position: fixed;
     inset: 0;
@@ -517,11 +500,13 @@ h1 {
     justify-content: center;
 }
 
-.education-delete-modal:popover-open {
+.education-delete-modal:popover-open,
+.experience-delete-modal:popover-open {
     display: flex;
 }
 
-.education-delete-modal__backdrop {
+.education-delete-modal__backdrop,
+.experience-delete-modal__backdrop {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -532,7 +517,8 @@ h1 {
     cursor: default;
 }
 
-.education-delete-modal__content {
+.education-delete-modal__content,
+.experience-delete-modal__content {
     position: relative;
     z-index: 1;
     width: min(100%, 480px);
@@ -543,7 +529,8 @@ h1 {
     box-shadow: 0 1rem 3rem rgba(28, 25, 23, 0.22);
 }
 
-.education-delete-modal__content h2 {
+.education-delete-modal__content h2,
+.experience-delete-modal__content h2 {
     margin: 0 0 0.75rem;
     font-family:
         "Space Grotesk",
@@ -552,7 +539,8 @@ h1 {
     font-size: 1.5rem;
 }
 
-.education-delete-modal__close {
+.education-delete-modal__close,
+.experience-delete-modal__close {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -565,7 +553,8 @@ h1 {
     cursor: pointer;
 }
 
-.education-delete-modal__actions {
+.education-delete-modal__actions,
+.experience-delete-modal__actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
@@ -603,41 +592,49 @@ h1 {
         justify-content: flex-start;
     }
 
-    /* education */
-    .education-header {
+    /* education, experience */
+    .education-header,
+    .experience-header {
         align-items: flex-start;
         flex-direction: column;
     }
 
-    .education-add-button {
+    .education-add-button,
+    .experience-add-button {
         width: 100%;
         justify-content: center;
     }
 
-    .education-search {
+    .education-search,
+    .experience-search {
         flex-direction: column;
     }
 
-    .education-search .button {
+    .education-search .button,
+    .experience-search .button {
         width: 100%;
     }
 
-    .education-delete-modal {
+    .education-delete-modal,
+    .experience-delete-modal {
         align-items: flex-end;
         padding: 0;
     }
 
-    .education-delete-modal__content {
+    .education-delete-modal__content,
+    .experience-delete-modal__content {
         width: 100%;
         padding: 1.25rem;
         border-radius: var(--radius) var(--radius) 0 0;
     }
 
-    .education-delete-modal__actions {
+    .education-delete-modal__actions,
+    .experience-delete-modal__actions {
         flex-direction: column-reverse;
     }
 
-    .education-delete-modal__actions .button {
+    .education-delete-modal__actions .button,
+    .experience-delete-modal__actions .button {
         width: 100%;
         text-align: center;
     }
