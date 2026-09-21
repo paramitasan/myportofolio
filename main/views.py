@@ -75,6 +75,47 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
+def edit_experience(request, exp_id):
+    exp = get_object_or_404(Experience, pk=exp_id)
+    form = ExperienceForm(request.POST or None, instance=exp)
+
+    if request.method == "POST":
+        user_passcode = request.POST.get("passcode", "")
+        if user_passcode != settings.SECRET_PASSCODE:
+            messages.error(request, "Incorrect passcode: no authority to edit experience.")
+            context = {
+                "name": "Paramita",
+                "form": form,
+                "is_edit": True,
+            }
+            return render(request, "experience_form.html", context)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Experience has successfully been updated!")
+            return redirect("main:show_experience")
+
+    context = {
+        "name": "Paramita",
+        "form": form,
+        "is_edit": True,  # To differentiate between create & [edit]
+    }
+    return render(request, "experience_form.html", context)
+
+def delete_experience(request, exp_id):
+    exp = get_object_or_404(Experience, pk=exp_id)
+
+    if request.method == "POST":
+        user_passcode = request.POST.get("passcode", "")
+        if user_passcode == settings.SECRET_PASSCODE:
+            exp.delete()
+            messages.success(request, "Experience has successfully been deleted.")
+        else:
+            messages.error(request, "Incorrect passcode: no authority to delete experience.")
+        return redirect("main:show_experience")
+
+    return redirect("main:show_experience")
+
 
 def get_education_json(request):
     edu = Education.objects.all()
