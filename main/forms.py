@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from main.models import Education
+from main.models import Education, Experience
 
 class EducationForm(ModelForm):
     class Meta:
@@ -44,4 +44,60 @@ class EducationForm(ModelForm):
                     "rows": 4,
                 }
             ),
+        }
+
+class ExperienceForm(ModelForm):
+    class Meta:
+        model = Experience
+        fields = [
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "started_at",
+            "ended_at",
+        ]
+
+        labels = {
+            "title": "Job Title",
+            "description": "What You Did",
+            "category": "Employment Type",
+            "thumbnail": "Thumbnail link",
+            "started_at": "Start Date",
+            "ended_at": "End Date",
+        }
+
+        widgets = {
+            "title": forms.TextInput(
+                attrs={
+                    "placeholder": "Example: Teaching Assistant",
+                    "maxlength": 255,
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "placeholder": "Describe the activities you've done in this institution!",
+                    "rows": 4,
+                }
+            ),
+            "category": forms.Select(
+                attrs={
+                    "class": "form-select",
+                }
+            ),
+            "thumbnail": forms.URLInput(
+                attrs={
+                    "placeholder": "Example: https://drive.google.com/...",
+                }
+            ),
+            "started_at": forms.DateInput(
+                attrs={
+                    "type": "date",
+                }
+            ),
+            "ended_at": forms.DateInput(
+                attrs={
+                    "type": "date",
+                }
+            ),            
         }

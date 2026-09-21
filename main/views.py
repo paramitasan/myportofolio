@@ -3,7 +3,7 @@ from main.models import Experience, Education
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
-from main.forms import EducationForm
+from main.forms import ExperienceForm, EducationForm
 from portofolio import settings
 
 def show_main(request):
@@ -22,12 +22,69 @@ def show_main(request):
     return render(request, "index.html", context)
 
 
+def get_experience_json(request):
+    exp = Experience.objects.all()
+    title_query = request.GET.get("title", "").strip()
+
+    if title_query:
+        exp = exp.filter(title__icontains=title_query)
+
+    exp_json = serializers.serialize("json", exp)
+    return HttpResponse(exp_json, content_type="application/json")
+
 def show_experience(request):
+    json_response = get_experience_json(request)
+    
+    experience = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    experience = [exp.object for exp in experience]
+    title_query = request.GET.get("title", "").strip()
+    
     context = {
         "name": "Paramita",
-        "experience_list": Experience.objects.all(),
-    }
+        "experience_list": experience,
+        "title_query": title_query,
+        }
     return render(request, "experience.html", context)
+
+def create_experience(request):
+    form = ExperienceForm(request.POST or None)
+
+    if request.method == "POST":
+        user_passcode = request.POST.get("passcode", "")
+        if user_passcode != settings.SECRET_PASSCODE:
+            messages.error(request, "Incorrect passcode: no authority to add experience.")
+            context = {
+                "name": "Paramita",
+                "form": form,
+                "is_edit": False,
+            }
+            return render(request, "experience_form.html", context)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Experience has successfully been added!")
+            return redirect("main:show_experience")
+
+    context = {
+        "name": "Paramita",
+        "form": form,
+        "is_edit": False,  #To differentiate between [create] & edit
+    }
+    return render(request, "experience_form.html", context)
+
+
+def get_education_json(request):
+    edu = Education.objects.all()
+    institution_name_query = request.GET.get("institution_name", "").strip()
+
+    if institution_name_query:
+        edu = edu.filter(institution_name__icontains=institution_name_query)
+
+    edu_json = serializers.serialize("json", edu)
+    return HttpResponse(edu_json, content_type="application/json")
 
 def show_education(request):
     json_response = get_education_json(request)
@@ -56,6 +113,7 @@ def create_education(request):
             context = {
                 "name": "Paramita",
                 "form": form,
+                "is_edit": False,
             }
             return render(request, "education_form.html", context)
 
@@ -97,16 +155,6 @@ def edit_education(request, edu_id):
         "is_edit": True,  # To differentiate between create & [edit]
     }
     return render(request, "education_form.html", context)
-
-def get_education_json(request):
-    edu = Education.objects.all()
-    institution_name_query = request.GET.get("institution_name", "").strip()
-
-    if institution_name_query:
-        edu = edu.filter(institution_name__icontains=institution_name_query)
-
-    edu_json = serializers.serialize("json", edu)
-    return HttpResponse(edu_json, content_type="application/json")
 
 def delete_education(request, edu_id):
     edu = get_object_or_404(Education, pk=edu_id)
