@@ -49,12 +49,16 @@ def show_experience(request):
     )
     experience = [exp.object for exp in experience]
     title_query = request.GET.get("title", "").strip()
+
+    # superuser must also have editor permission
+    is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
     
     context = {
         "name": "Paramita",
         "experience_list": experience,
         "title_query": title_query,
-        }
+        "is_editor": is_editor,
+    }
     return render(request, "experience.html", context)
 
 @login_required(login_url="/login/")
@@ -79,7 +83,9 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def edit_experience(request, exp_id):
-    if not request.user.is_superuser:
+    is_editor = request.user.is_superuser or request.user.groups.filter(name="Editors").exists()
+
+    if not is_editor:
         raise PermissionDenied
 
     exp = get_object_or_404(Experience, pk=exp_id)
@@ -145,10 +151,13 @@ def show_education(request):
     education = [edu.object for edu in education]
     institution_name_query = request.GET.get("institution_name", "").strip()
 
+    is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
+
     context = {
         "name": "Paramita",
         "education_list": education,
         "institution_name_query": institution_name_query,
+        "is_editor": is_editor,
     }
     return render(request, "education.html", context)
 
@@ -174,7 +183,9 @@ def create_education(request):
 
 @login_required(login_url="/login/")
 def edit_education(request, edu_id):
-    if not request.user.is_superuser:
+    is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
+
+    if not is_editor:
         raise PermissionDenied
 
     edu = get_object_or_404(Education, pk=edu_id)
