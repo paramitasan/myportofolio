@@ -4,7 +4,7 @@
             popovertarget="delete-education-{{ education.id }}"
             aria-label="Delete {{ education.institution_name }} record"
             title="Delete education">
-        Delete record
+        Delete
     </button>
 </p>
 <div id="delete-education-{{ education.id }}"
@@ -32,12 +32,6 @@
 
         <form method="post" action="{% url 'main:delete_education' education.id %}">
             {% csrf_token %}    
-            <div class="form-group">
-                <input type="password"
-                       name="passcode"
-                       placeholder="Enter admin passcode"
-                       required>
-            </div>
             <div class="education-delete-modal__actions">
                 <button type="button"
                         class="button button-secondary"

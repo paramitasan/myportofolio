@@ -3,6 +3,8 @@ from main.models import Experience, Education
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.core import serializers
 from django.http import HttpResponse
 from main.forms import ExperienceForm, EducationForm
@@ -27,6 +29,7 @@ def show_main(request):
     return render(request, "index.html", context)
 
 
+# experience
 def get_experience_json(request):
     exp = Experience.objects.all()
     title_query = request.GET.get("title", "").strip()
@@ -54,20 +57,14 @@ def show_experience(request):
         }
     return render(request, "experience.html", context)
 
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = ExperienceForm(request.POST or None)
 
     if request.method == "POST":
-        user_passcode = request.POST.get("passcode", "")
-        if user_passcode != settings.SECRET_PASSCODE:
-            messages.error(request, "Incorrect passcode: no authority to add experience.")
-            context = {
-                "name": "Paramita",
-                "form": form,
-                "is_edit": False,
-            }
-            return render(request, "experience_form.html", context)
-
         if form.is_valid():
             form.save()
             messages.success(request, "Experience has successfully been added!")
@@ -80,21 +77,15 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
+@login_required(login_url="/login/")
 def edit_experience(request, exp_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     exp = get_object_or_404(Experience, pk=exp_id)
     form = ExperienceForm(request.POST or None, instance=exp)
 
     if request.method == "POST":
-        user_passcode = request.POST.get("passcode", "")
-        if user_passcode != settings.SECRET_PASSCODE:
-            messages.error(request, "Incorrect passcode: no authority to edit experience.")
-            context = {
-                "name": "Paramita",
-                "form": form,
-                "is_edit": True,
-            }
-            return render(request, "experience_form.html", context)
-
         if form.is_valid():
             form.save()
             messages.success(request, "Experience has successfully been updated!")
@@ -107,21 +98,21 @@ def edit_experience(request, exp_id):
     }
     return render(request, "experience_form.html", context)
 
+@login_required(login_url="/login/")
 def delete_experience(request, exp_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     exp = get_object_or_404(Experience, pk=exp_id)
 
     if request.method == "POST":
-        user_passcode = request.POST.get("passcode", "")
-        if user_passcode == settings.SECRET_PASSCODE:
-            exp.delete()
-            messages.success(request, "Experience has successfully been deleted.")
-        else:
-            messages.error(request, "Incorrect passcode: no authority to delete experience.")
-        return redirect("main:show_experience")
+        exp.delete()
+        messages.success(request, "Experience has successfully been deleted.")
 
     return redirect("main:show_experience")
 
 
+# education
 def get_education_json(request):
     edu = Education.objects.all()
     institution_name_query = request.GET.get("institution_name", "").strip()
@@ -149,20 +140,14 @@ def show_education(request):
     }
     return render(request, "education.html", context)
 
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = EducationForm(request.POST or None)
 
     if request.method == "POST":
-        user_passcode = request.POST.get("passcode", "")
-        if user_passcode != settings.SECRET_PASSCODE:
-            messages.error(request, "Incorrect passcode: no authority to add education records.")
-            context = {
-                "name": "Paramita",
-                "form": form,
-                "is_edit": False,
-            }
-            return render(request, "education_form.html", context)
-
         if form.is_valid():
             form.save()
             messages.success(request, "Education record has successfully been added!")
@@ -175,21 +160,15 @@ def create_education(request):
     }
     return render(request, "education_form.html", context)
 
+@login_required(login_url="/login/")
 def edit_education(request, edu_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     edu = get_object_or_404(Education, pk=edu_id)
     form = EducationForm(request.POST or None, instance=edu)
 
     if request.method == "POST":
-        user_passcode = request.POST.get("passcode", "")
-        if user_passcode != settings.SECRET_PASSCODE:
-            messages.error(request, "Incorrect passcode: no authority to edit education records.")
-            context = {
-                "name": "Paramita",
-                "form": form,
-                "is_edit": True,
-            }
-            return render(request, "education_form.html", context)
-
         if form.is_valid():
             form.save()
             messages.success(request, "Education record has successfully been updated!")
@@ -202,19 +181,19 @@ def edit_education(request, edu_id):
     }
     return render(request, "education_form.html", context)
 
+@login_required(login_url="/login/")
 def delete_education(request, edu_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     edu = get_object_or_404(Education, pk=edu_id)
 
     if request.method == "POST":
-        user_passcode = request.POST.get("passcode", "")
-        if user_passcode == settings.SECRET_PASSCODE:
-            edu.delete()
-            messages.success(request, "Education record has successfully been deleted.")
-        else:
-            messages.error(request, "Incorrect passcode: no authority to delete education records.")
-        return redirect("main:show_education")
+        edu.delete()
+        messages.success(request, "Education record has successfully been deleted.")
 
     return redirect("main:show_education")
+
 
 # Authentication, session, cookies
 def register(request):
