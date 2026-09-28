@@ -1,20 +1,14 @@
 {% extends "base.html" %}
 {% block meta %}
-    <title> {% if is_edit %} Edit Experience
-            {% else %} Add Experience
-            {% endif %} - {{ name }} </title>
+    <title>Login - {{ name }}</title>
 {% endblock meta %}
 {% block content %}
     <main>
         <section class="experience-section">
             <div class="container">
-                <h1> {% if is_edit %} Edit Experience
-                     {% else %} Add Experience
-                     {% endif %} </h1>
-                <form method="post"
-                      class="experience-form">
+                <h1>Login</h1>
+                <form method="post" action="{% url 'main:login' %}" class="project-form">
                     {% csrf_token %}
-
                     {% for field in form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -24,12 +18,12 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
-
-                    <button type="submit" class="button"> {% if is_edit %} Save changes
-                                                          {% else %} Add experience
-                                                          {% endif %} </button>
-                    <a href="{% url 'main:show_experience' %}" class="button button-secondary">Cancel</a>
+                    {% for error in form.non_field_errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                    <button type="submit" class="button">Login</button>
                 </form>
+                <p>No account yet? <a href="{% url 'main:register' %}">Register here</a>.</p>
             </div>
         </section>
     </main>

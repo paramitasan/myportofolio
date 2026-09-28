@@ -4,7 +4,7 @@
             popovertarget="delete-experience-{{ experience.id }}"
             aria-label="Delete {{ experience.title }}"
             title="Delete experience">
-        Delete experience
+        Delete
     </button>
 </p>
 <div id="delete-experience-{{ experience.id }}"
@@ -32,12 +32,6 @@
 
         <form method="post" action="{% url 'main:delete_experience' experience.id %}">
             {% csrf_token %}    
-            <div class="form-group">
-                <input type="password"
-                       name="passcode"
-                       placeholder="Enter admin passcode"
-                       required>
-            </div>
             <div class="experience-delete-modal__actions">
                 <button type="button"
                         class="button button-secondary"

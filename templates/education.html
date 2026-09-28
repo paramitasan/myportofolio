@@ -10,11 +10,13 @@
                 <p class="section-kicker">My journey so far</p>
                 <div class="education-header">
                     <h1>Education</h1>
-                    <a href="{% url 'main:create_education' %}"
-                       class="button education-add-button">
-                            <span aria-hidden="true">+</span>
-                        Add Edu Record
-                    </a>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_education' %}"
+                           class="button education-add-button">
+                                <span aria-hidden="true">+</span>
+                            Add Edu Record
+                        </a>
+                    {% endif %}
                 </div>
 
                 <form method="get"
@@ -46,11 +48,15 @@
                             </p>
                             <div class="education-card-actions">
                                 <div class="education-actions">
-                                    <a href="{% url 'main:edit_education' edu.id %}" 
-                                       class="button button-secondary">
-                                        Edit
-                                    </a>
-                                    {% include "education_delete_modal.html" with education=edu %}
+                                    {% if is_editor %}
+                                        <a href="{% url 'main:edit_education' edu.id %}" 
+                                           class="button button-secondary">
+                                            Edit
+                                        </a>
+                                    {% endif %}
+                                    {% if user.is_superuser %}
+                                        {% include "education_delete_modal.html" with education=edu %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </article>

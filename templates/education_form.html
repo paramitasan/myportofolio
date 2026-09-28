@@ -24,17 +24,8 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
-                    
-                    <div class="form-group">
-                        <label for="passcode">Admin Passcode</label>
-                        <input type="password" 
-                               id="passcode" 
-                               name="passcode" 
-                               placeholder="Enter admin passcode to save" 
-                               required>
-                    </div>
 
-                    <button type="submit" class="button"> {% if is_edit %} Edit record
+                    <button type="submit" class="button"> {% if is_edit %} Save changes
                                                           {% else %} Add record
                                                           {% endif %} </button>
                     <a href="{% url 'main:show_education' %}" class="button button-secondary">Cancel</a>
