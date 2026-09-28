@@ -48,9 +48,10 @@
                             </p>
                             <div class="education-card-actions">
                                 <div class="education-actions">
+                                    {% include "components/education_star.html" with education=edu %}
                                     {% if is_editor %}
                                         <a href="{% url 'main:edit_education' edu.id %}" 
-                                           class="button button-secondary">
+                                           class="button button-secondary-edit">
                                             Edit
                                         </a>
                                     {% endif %}

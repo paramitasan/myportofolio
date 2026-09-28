@@ -402,6 +402,10 @@ h1 {
 }
 
 .button-secondary {
+    background: var(--ink);
+}
+
+.button-secondary-edit {
     background: #4c4749;
 }
 
