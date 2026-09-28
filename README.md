@@ -5,7 +5,12 @@ NPM: **2506554171**
 Class: **KKI**<br>
 
 ### Description
-This project is a portofolio website which displays my academic profile, experiencesm, interests, and many more. This site is built with HTML5, CSS3, and Django.<br>
+This project is a portofolio website which displays my academic profile, experiencesm, interests, and many more.<br><br>
+
+### Tech Stack
+- **Backend**: Python (Django)
+- **Frontend**: HTML5, CSS3
+<br><br>
 
 ### Set up locally
 1. Clone the repository:
