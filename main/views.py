@@ -37,7 +37,7 @@ def get_experience_json(request):
     if title_query:
         exp = exp.filter(title__icontains=title_query)
 
-    exp_json = serializers.serialize("json", exp)
+    exp_json = serializers.serialize("json", exp, use_natural_foreign_keys=True)
     return HttpResponse(exp_json, content_type="application/json")
 
 def show_experience(request):
@@ -108,6 +108,18 @@ def delete_experience(request, exp_id):
     if request.method == "POST":
         exp.delete()
         messages.success(request, "Experience has successfully been deleted.")
+
+    return redirect("main:show_experience")
+
+@login_required(login_url="/login/")
+def toggle_star_experience(request, exp_id):
+    exp = get_object_or_404(Experience, pk=exp_id)
+
+    if request.method == "POST":
+        if request.user in exp.starred_by.all():
+            exp.starred_by.remove(request.user)
+        else:
+            exp.starred_by.add(request.user)
 
     return redirect("main:show_experience")
 
