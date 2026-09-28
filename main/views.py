@@ -217,6 +217,18 @@ def delete_education(request, edu_id):
 
     return redirect("main:show_education")
 
+@login_required(login_url="/login/")
+def toggle_star_education(request, edu_id):
+    edu = get_object_or_404(Education, pk=edu_id)
+
+    if request.method == "POST":
+        if request.user in edu.starred_by.all():
+            edu.starred_by.remove(request.user)
+        else:
+            edu.starred_by.add(request.user)
+
+    return redirect("main:show_education")
+
 
 # Authentication, session, cookies
 def register(request):

@@ -47,3 +47,6 @@ class Education(models.Model):
         validators=[MinValueValidator(2010),MaxValueValidator(2100)]
     )
     description = models.TextField(max_length=400, default="")
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_education", blank=True
+    )

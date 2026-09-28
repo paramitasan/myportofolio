@@ -4,6 +4,7 @@ from main.views import show_main
 from main.views import show_experience, create_experience, get_experience_json, delete_experience, edit_experience
 from main.views import toggle_star_experience
 from main.views import show_education, create_education, get_education_json, delete_education, edit_education
+from main.views import toggle_star_education
 from main.views import register, login_user, logout_user
 
 app_name = "main"
@@ -23,6 +24,7 @@ urlpatterns = [
     path("api/education/", get_education_json, name="get_education_json"),
     path("education/<uuid:edu_id>/delete/", delete_education, name="delete_education"),
     path("education/<uuid:edu_id>/edit/", edit_education, name="edit_education"),
+    path("education/<uuid:edu_id>/star/", toggle_star_education, name="toggle_star_education"),
 
     # path("projects/", show_projects, name="show_projects"),
 

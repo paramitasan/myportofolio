@@ -48,9 +48,10 @@
                             {% endif %}
                             <div class="experience-card-actions">
                                 <div class="experience-actions">
+                                    {% include "components/experience_star.html" with experience=experience %}
                                     {% if is_editor %}
                                         <a href="{% url 'main:edit_experience' experience.id %}" 
-                                           class="button button-secondary">
+                                           class="button button-secondary-edit">
                                             Edit
                                         </a>
                                     {% endif %}
