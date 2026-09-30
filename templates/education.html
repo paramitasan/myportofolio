@@ -84,6 +84,16 @@
         gridContainer.classList.toggle('hide', !showGrid);
     }
 
+    // Convert special HTML characters into entities so they display as text
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
     // Build a edu card element
     function buildEducationCardElement(item) {
         const edu = item.fields;
