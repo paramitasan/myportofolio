@@ -6,7 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from main.forms import ExperienceForm, EducationForm
 from portofolio import settings
 import datetime
@@ -132,30 +132,39 @@ def toggle_star_experience(request, exp_id):
 
 # education
 def get_education_json(request):
-    edu = Education.objects.all()
+    edu_records = Education.objects.all()
     institution_name_query = request.GET.get("institution_name", "").strip()
 
     if institution_name_query:
-        edu = edu.filter(institution_name__icontains=institution_name_query)
+        edu_records = edu_records.filter(institution_name__icontains=institution_name_query)
 
-    edu_json = serializers.serialize("json", edu)
-    return HttpResponse(edu_json, content_type="application/json")
+    data = []
+    for record in edu_records:
+        starred_users = record.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(record.id),
+            "fields": {
+                "institution_name": record.institution_name,
+                "starting_year": record.starting_year,
+                "end_year": record.end_year,
+                "description": record.description,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+    return JsonResponse(data, safe=False)
 
 def show_education(request):
-    json_response = get_education_json(request)
-
-    education = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    education = [edu.object for edu in education]
     institution_name_query = request.GET.get("institution_name", "").strip()
 
     is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
 
     context = {
         "name": "Paramita",
-        "education_list": education,
         "institution_name_query": institution_name_query,
         "is_editor": is_editor,
     }
