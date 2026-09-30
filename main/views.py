@@ -167,6 +167,7 @@ def show_education(request):
         "name": "Paramita",
         "institution_name_query": institution_name_query,
         "is_editor": is_editor,
+        "form": EducationForm(),
     }
     return render(request, "education.html", context)
 
