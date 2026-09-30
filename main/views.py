@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse
 from main.forms import ExperienceForm, EducationForm
-from portofolio import settings
+from django.views.decorators.http import require_POST
 import datetime
 
 def show_main(request):
@@ -170,6 +170,24 @@ def show_education(request):
         "form": EducationForm(),
     }
     return render(request, "education.html", context)
+
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add projects."},
+            status=403,
+        )
+
+    form = EducationForm(request.POST)
+    if form.is_valid():
+        project = form.save()
+        return JsonResponse(
+            {"message": "Project added successfully.", "pk": str(project.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")
 def create_education(request):
