@@ -25,7 +25,10 @@
                         </div>
                     {% endfor %}
 
-                    <button type="submit" class="button"> {% if is_edit %} Save changes
+                    <button type="submit" class="button" onclick=
+                        "if (this.is_edit) {showToast('System Notification', 'Changes saved.', 'success')}
+                        else {showToast('System Notification', 'Successfully added education record.', 'success')}">
+                                                          {% if is_edit %} Save changes
                                                           {% else %} Add record
                                                           {% endif %} </button>
                     <a href="{% url 'main:show_education' %}" class="button button-secondary">Cancel</a>
