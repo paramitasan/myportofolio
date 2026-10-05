@@ -31,23 +31,36 @@ def show_main(request):
 
 # experience
 def get_experience_json(request):
-    exp = Experience.objects.all()
+    experiences = Experience.objects.prefetch_related("starred_by").all()
     title_query = request.GET.get("title", "").strip()
 
     if title_query:
-        exp = exp.filter(title__icontains=title_query)
+        experiences = experiences.filter(title__icontains=title_query)
 
-    exp_json = serializers.serialize("json", exp, use_natural_foreign_keys=True)
-    return HttpResponse(exp_json, content_type="application/json")
+    data = []
+    for exp in experiences:
+        starred_users = exp.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(exp.id),
+            "fields": {
+                "title": exp.title,
+                "description": exp.description,
+                "category": exp.category,
+                "thumbnail": exp.thumbnail,
+                "started_at": exp.started_at.isoformat() if exp.started_at else False,
+                "ended_at": exp.ended_at.isoformat() if exp.ended_at else False,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 def show_experience(request):
-    json_response = get_experience_json(request)
-    
-    experience = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    experience = [exp.object for exp in experience]
     title_query = request.GET.get("title", "").strip()
 
     # superuser must also have editor permission
@@ -55,7 +68,6 @@ def show_experience(request):
     
     context = {
         "name": "Paramita",
-        "experience_list": experience,
         "title_query": title_query,
         "is_editor": is_editor,
     }
@@ -132,7 +144,7 @@ def toggle_star_experience(request, exp_id):
 
 # education
 def get_education_json(request):
-    edu_records = Education.objects.all()
+    edu_records = Education.objects.prefetch_related("starred_by").all()
     institution_name_query = request.GET.get("institution_name", "").strip()
 
     if institution_name_query:

@@ -47,7 +47,7 @@
                 </div>
                 
                 <!-- Education Grid -->
-                <div id="grid" class="experience-grid education-grid hide"></div>
+                <div id="grid" class="education-grid hide"></div>
             </div>
         </section>
     </main>
@@ -100,12 +100,12 @@
         const eduId = item.pk;
 
         const articleElement = document.createElement('article');
-        articleElement.className = 'experience-card';
+        articleElement.className = 'education-card';
 
         // Format years display (e.g., 2020 - 2024 or 2020 - Present)
         const endYearText = edu.end_year ? edu.end_year : 'Present';
         const yearsHtml = (edu.starting_year || edu.end_year) 
-            ? `<span class="experience-category">${edu.starting_year || ''} - ${endYearText}</span>` 
+            ? `<span class="education-year">${edu.starting_year || ''} — ${endYearText}</span>` 
             : '';
 
         // A dummy UUID used as a placeholder to be replaced with the real ID from the JSON data
@@ -137,10 +137,10 @@
         // Card component
         const completeCardHtml = `
             <h2>${edu.institution_name}</h2>
-            ${yearsHtml}
-            <p class="experience-description">${edu.description}</p>
-            <div class="experience-card-actions">
-                <div class="experience-actions">
+            <p>${yearsHtml}</p>
+            <p class="education-description">${edu.description}</p>
+            <div class="education-card-actions">
+                <div class="education-actions">
                     <form method="post" action="${starUrl}" class="star-form">
                         {% csrf_token %}
                         <button type="submit" class="button button-star${isStarredClass}" title="${starTitle}">
