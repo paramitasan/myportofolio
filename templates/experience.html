@@ -31,7 +31,7 @@
                 </form>
 
                 <!--  Loading State -->
-                <div id="loading" class="empty-state hide">
+                <div id="loading" class="loading-state hide">
                     <p>Loading experiences ...</p>
                 </div>
                 
@@ -46,6 +46,7 @@
                 </div>
 
                 <!--  Experience Grid -->
+                <p id="result-count" class="result-count hide"></p>
                 <div id="grid" class="experience-grid hide"></div>
             </div>
         </section>
@@ -67,6 +68,7 @@
     const errorState = document.getElementById('error');
     const emptyState = document.getElementById('empty');
     const gridContainer = document.getElementById('grid');
+    const resultCount = document.getElementById('result-count');
     const searchForm = document.getElementById('experience-search-form');
     const searchInput = document.getElementById('search-input');
 
@@ -79,6 +81,7 @@
         errorState.classList.toggle('hide', !showError);
         emptyState.classList.toggle('hide', !showEmpty);
         gridContainer.classList.toggle('hide', !showGrid);
+        resultCount.classList.toggle('hide', !showGrid); // Only shows when grid is shown
     }
 
     // Convert special HTML characters into entities so they display as text
@@ -184,6 +187,14 @@
                 experienceData.forEach(item => {
                     gridContainer.appendChild(buildExperienceCardElement(item));
                 });
+                
+                // "Showing x results" if there's item; "Found x items" when searching
+                if (resultCount) {
+                resultCount.textContent = searchQuery 
+                    ? `Found ${experienceData.length} item(s) for "${searchQuery}"`
+                    : `Showing all ${experienceData.length} item(s)`;
+                }
+                
                 displayPageSection({ showGrid: true });
             }
         } catch (error) {

@@ -325,10 +325,16 @@ h1 {
 
 .experience-description,
 .education-description,
-.empty-state {
+.empty-state,
+.error-state,
+.loading-state {
     color: var(--text-muted);
     margin: 1rem 0 0;
     overflow-wrap: break-word;
+}
+
+.result-count {
+    padding: 0.65rem 0.5rem;
 }
 
 .experience-status {
