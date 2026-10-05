@@ -51,6 +51,10 @@
         </section>
     </main>
 
+    {% if user.is_superuser %}
+        {% include "components/experience_form_modal.html" %}
+    {% endif %}
+
     <script>
     // Configuration
     const BASE_EXPERIENCE_ENDPOINT = "{% url 'main:get_experience_json' %}";
@@ -197,6 +201,10 @@
         clearTimeout(searchDebounceTimer);
         searchExperience();
     });
+
+    function closeProjectModal() {
+        document.getElementById("add-experience-modal").hidePopover();
+    }
 
     // Start the application
     fetchExperience(searchInput.value.trim());

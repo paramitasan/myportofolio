@@ -70,6 +70,7 @@ def show_experience(request):
         "name": "Paramita",
         "title_query": title_query,
         "is_editor": is_editor,
+        "form": ExperienceForm(),
     }
     return render(request, "experience.html", context)
 
