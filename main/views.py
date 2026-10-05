@@ -5,8 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core import serializers
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from main.forms import ExperienceForm, EducationForm
 from django.views.decorators.http import require_POST
 import datetime
@@ -117,7 +116,7 @@ def edit_experience(request, exp_id):
     is_editor = request.user.is_superuser or request.user.groups.filter(name="Editors").exists()
 
     if not is_editor:
-        raise PermissionDenied
+        return JsonResponse({"message": "Permission denied."}, status=403)
 
     exp = get_object_or_404(Experience, pk=exp_id)
     form = ExperienceForm(request.POST or None, instance=exp)
@@ -245,7 +244,7 @@ def edit_education(request, edu_id):
     is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
 
     if not is_editor:
-        raise PermissionDenied
+        return JsonResponse({"message": "Permission denied."}, status=403)
 
     edu = get_object_or_404(Education, pk=edu_id)
     form = EducationForm(request.POST or None, instance=edu)

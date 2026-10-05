@@ -81,6 +81,16 @@
         gridContainer.classList.toggle('hide', !showGrid);
     }
 
+    // Convert special HTML characters into entities so they display as text
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
     // Build a experience card element
     function buildExperienceCardElement(item) {
         const exp = item.fields;
@@ -90,7 +100,7 @@
         articleElement.className = 'experience-card';
 
         const imageHtml = exp.thumbnail
-            ? `<img src="${exp.thumbnail}" alt="Image of ${exp.title}" class="experience-image">`
+            ? `<img src="${escapeHtml(exp.thumbnail)}" alt="Image of ${escapeHtml(exp.title)}" class="experience-image">`
             : '';
 
         // A dummy UUID used as a placeholder to be replaced with the real ID from the JSON data
@@ -122,8 +132,8 @@
         const completeCardHtml = `
             ${imageHtml}
             <p class="experience-category">${exp.category}</p>
-            <h2>${exp.title}</h2>
-            <p class="experience-description">${exp.description}</p>
+            <h2>${escapeHtml(exp.title)}</h2>
+            <p class="experience-description">${escapeHtml(exp.description)}</p>
             <p class="experience-status">${exp.ended_at ? 'Completed' : 'Ongoing'}</p>
             <div class="experience-card-actions">
                 <div class="experience-actions">

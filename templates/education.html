@@ -136,9 +136,9 @@
 
         // Card component
         const completeCardHtml = `
-            <h2>${edu.institution_name}</h2>
+            <h2>${escapeHtml(edu.institution_name)}</h2>
             <p>${yearsHtml}</p>
-            <p class="education-description">${edu.description}</p>
+            <p class="education-description">${escapeHtml(edu.description)}</p>
             <div class="education-card-actions">
                 <div class="education-actions">
                     <form method="post" action="${starUrl}" class="star-form">
@@ -240,11 +240,11 @@
                 const errorMessages = result.errors
                     ? Object.values(result.errors).flat().map(error => error.message)
                     : [result.message || `Something went wrong (status ${response.status}).`];
-                showToast('Failed to add record', errorMessages.join(' '), 'error');
+                showToast('Failed to add education record', errorMessages.join(' '), 'error');
             }
         } catch (error) {
             console.error('Error adding record:', error);
-            showToast('Failed to add record', 'Could not reach the server. Please try again.', 'error');
+            showToast('Failed to add education record', 'Could not reach the server. Please try again.', 'error');
         } finally {
             submitButton.disabled = false;
         }
