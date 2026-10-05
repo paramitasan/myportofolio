@@ -1,6 +1,8 @@
 from django import forms
 from django.forms import ModelForm
 from main.models import Education, Experience
+from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
 
 class EducationForm(ModelForm):
     class Meta:
@@ -45,6 +47,15 @@ class EducationForm(ModelForm):
                 }
             ),
         }
+
+    def clean_institution_name(self):
+        institution_name = strip_tags(self.cleaned_data["institution_name"]).strip()
+        if not institution_name:
+            raise ValidationError("Institution name can't contain only HTML tags.")
+        return institution_name
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
 
 class ExperienceForm(ModelForm):
     class Meta:
@@ -101,3 +112,12 @@ class ExperienceForm(ModelForm):
                 }
             ),            
         }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Job title can't contain only HTML tags.")
+        return title
+    
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()

@@ -22,7 +22,7 @@ class Experience(models.Model):
         default="full-time",
     )
     thumbnail = models.URLField(blank=True, null=True)
-    started_at = models.DateTimeField(blank=True, null=True)
+    started_at = models.DateTimeField()
     ended_at = models.DateTimeField(blank=True, null=True)
     starred_by = models.ManyToManyField(
         User, related_name="starred_experience", blank=True
@@ -39,7 +39,6 @@ class Education(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     institution_name = models.CharField(max_length=255)
     starting_year = models.PositiveIntegerField(
-        blank=True, null=True,
         validators=[MinValueValidator(2010),MaxValueValidator(2100)]
     )
     end_year = models.PositiveIntegerField(

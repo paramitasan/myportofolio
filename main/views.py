@@ -5,10 +5,9 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core import serializers
-from django.http import HttpResponse
+from django.http import JsonResponse
 from main.forms import ExperienceForm, EducationForm
-from portofolio import settings
+from django.views.decorators.http import require_POST
 import datetime
 
 def show_main(request):
@@ -31,23 +30,36 @@ def show_main(request):
 
 # experience
 def get_experience_json(request):
-    exp = Experience.objects.all()
+    experiences = Experience.objects.prefetch_related("starred_by").all()
     title_query = request.GET.get("title", "").strip()
 
     if title_query:
-        exp = exp.filter(title__icontains=title_query)
+        experiences = experiences.filter(title__icontains=title_query)
 
-    exp_json = serializers.serialize("json", exp, use_natural_foreign_keys=True)
-    return HttpResponse(exp_json, content_type="application/json")
+    data = []
+    for exp in experiences:
+        starred_users = exp.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(exp.id),
+            "fields": {
+                "title": exp.title,
+                "description": exp.description,
+                "category": exp.category,
+                "thumbnail": exp.thumbnail,
+                "started_at": exp.started_at.isoformat() if exp.started_at else False,
+                "ended_at": exp.ended_at.isoformat() if exp.ended_at else False,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 def show_experience(request):
-    json_response = get_experience_json(request)
-    
-    experience = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    experience = [exp.object for exp in experience]
     title_query = request.GET.get("title", "").strip()
 
     # superuser must also have editor permission
@@ -55,11 +67,29 @@ def show_experience(request):
     
     context = {
         "name": "Paramita",
-        "experience_list": experience,
         "title_query": title_query,
         "is_editor": is_editor,
+        "form": ExperienceForm(),
     }
     return render(request, "experience.html", context)
+
+@require_POST
+def create_experience_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add experiences."},
+            status=403,
+        )
+
+    form = ExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save()
+        return JsonResponse(
+            {"message": "Experience added successfully.", "pk": str(experience.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")
 def create_experience(request):
@@ -86,7 +116,7 @@ def edit_experience(request, exp_id):
     is_editor = request.user.is_superuser or request.user.groups.filter(name="Editors").exists()
 
     if not is_editor:
-        raise PermissionDenied
+        return JsonResponse({"message": "Permission denied."}, status=403)
 
     exp = get_object_or_404(Experience, pk=exp_id)
     form = ExperienceForm(request.POST or None, instance=exp)
@@ -132,34 +162,62 @@ def toggle_star_experience(request, exp_id):
 
 # education
 def get_education_json(request):
-    edu = Education.objects.all()
+    edu_records = Education.objects.prefetch_related("starred_by").all()
     institution_name_query = request.GET.get("institution_name", "").strip()
 
     if institution_name_query:
-        edu = edu.filter(institution_name__icontains=institution_name_query)
+        edu_records = edu_records.filter(institution_name__icontains=institution_name_query)
 
-    edu_json = serializers.serialize("json", edu)
-    return HttpResponse(edu_json, content_type="application/json")
+    data = []
+    for record in edu_records:
+        starred_users = record.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(record.id),
+            "fields": {
+                "institution_name": record.institution_name,
+                "starting_year": record.starting_year,
+                "end_year": record.end_year,
+                "description": record.description,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+    return JsonResponse(data, safe=False)
 
 def show_education(request):
-    json_response = get_education_json(request)
-
-    education = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    education = [edu.object for edu in education]
     institution_name_query = request.GET.get("institution_name", "").strip()
 
     is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
 
     context = {
         "name": "Paramita",
-        "education_list": education,
         "institution_name_query": institution_name_query,
         "is_editor": is_editor,
+        "form": EducationForm(),
     }
     return render(request, "education.html", context)
+
+@require_POST
+def create_education_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add education records."},
+            status=403,
+        )
+
+    form = EducationForm(request.POST)
+    if form.is_valid():
+        project = form.save()
+        return JsonResponse(
+            {"message": "Education record added successfully.", "pk": str(project.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")
 def create_education(request):
@@ -186,7 +244,7 @@ def edit_education(request, edu_id):
     is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
 
     if not is_editor:
-        raise PermissionDenied
+        return JsonResponse({"message": "Permission denied."}, status=403)
 
     edu = get_object_or_404(Education, pk=edu_id)
     form = EducationForm(request.POST or None, instance=edu)
