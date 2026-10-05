@@ -48,6 +48,43 @@ This project is a portofolio website which displays my academic profile, experie
 <br>
 
 ---
+### Week 5 - 05 Oct 2026
+- Implemented toast notification (success messages, informative error messages)
+- Created modal form for adding new Experience and Education record
+- Implemented adding data with AJAX
+- Displayed Education and Experience data with AJAX
+- Applied search debouncing for Education and Experience search
+- Displayed number of data found ★
+- Protected the webpage from XSS attacks (`strip_tags`, `clean_field`)<br>
+
+###### Reflection
+1. 
+    Debouncing is a performance optimization technique that delays the execution of a function until a specific amount of time has passed since the last event was triggered. In an AJAX search feature, debouncing waits for the user to pause typing (e.g., for 300 milliseconds) before sending a request to the server.
+    Without debouncing, every single keystroke makes different AJAX request. For instance, 'Django' would trigger 6 requests. Many search requests at a time strains the database, which could cause a server overload.
+2. 
+    `fetch()` is asynchronous—meaning network requests take time to travel to the server and back, so JavaScript runs `fetch()` in the background without blocking the rest of the browser. Because of this, `fetch()` returns a `Promise` (a placeholder object representing a future result) rather than the actual data right away.
+    To wait for `fetch()` to retrieve the actual data, we use `await`—telling JavaScript to pause execution inside an async function until `Promise` is resolved.
+    If we did not use `await`, JavaScript will immediately execute the following line of codes before the server gives the actual data. Instead of data, we will be left with unresolved `Promise` object.
+3. 
+    Cross-Site Scripting (XSS) is an attack in which an attacker injects malicious client-side code (usually JavaScript) into a web application. When other users visit the page, their browser executes the attacker's script, which can steal session cookies, access sensitive storage, or perform unauthorized actions on behalf of the user.
+    When using JavaScript to insert JSON data into the page (e.g., using `element.innerHTML = templateLiteral`), the browser does not automatically escape characters. If raw data containing  `<img src="x" onerror="alert('XSS')">` is injected directly into innerHTML, the browser parses it as active HTML and executes the embedded script immediately.
+    On the other hand, Django's template engine automatically escapes HTML characters in rendered variables. If an attacker submits `<script>stealCookies()</script>`, Django converts it to plain text on render, displaying the characters safely without running the script.
+    This is why AJAX/JavaScript is more vulnerable to XSS attack compared to Django. <br>
+
+###### AI Disclosure
+I used Google Gemini to help me check my code, fix flawed logic, give suggestions, and debug errors when the rendered page doesn't appear according to my expectations.
+
+- Prompts:
+    - "The education data doesn't show.. what's wrong? Is there any syntax error or typo ..."
+    - "Is this correct if I want to make AJAX way of fetching my experience data? Pay special attention for the data type declared to be shown in the page. If there's any incorrect format, please point it out and explain why it may cause error"
+    - "Both my education and experience page are working okay, but there's something wrong for experience: I need to click the Search button before being able to see the data. If I don't click the Search button, the data won't load. Do you know what's wrong, why it's wrong, and how to fix it?"
+    - "If I want to add result count, is this how I'm supposed to do it? (Search for result-count) 
+    How to ensure the result count only shows if there's experience result (not error, loading, or empty)?"
+
+- AI's Limitation & Manual Fix:
+    - Sometimes, the AI offers redundant/unmatching code solutions. As a result, I had to crosscheck between my code and suggested code so that there are no duplicates or mismatched variables.
+
+---
 ### Week 4 - 28 Sep 2026
 - Implemented authentication (register, log in, log out)
 - Implemented session and cookies (display and deletion of `last_login`)
@@ -127,7 +164,8 @@ Lastly, I also asked Gemini to help solve an issue I could not address when crea
 ---
 ### Week 1 - 07 Sep 2026
 - Initial setup
-- Added hero and skills section<br>
+- Added hero
+- Added skills section ★<br>
 
 ###### Reflection
 1. I used 'section', one of HTML5's semantic elements, to help me clearly seperate between distinct parts within my portofolio website (i.e. "hero" and "skills"). Section "hero" consists of my introduction, so detailed information is put in a different section. In my case, I put some of my skills and their illustrations on section "skills".
