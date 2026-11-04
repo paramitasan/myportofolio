@@ -113,7 +113,7 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def edit_experience(request, exp_id):
-    is_editor = request.user.is_superuser or request.user.groups.filter(name="Editors").exists()
+    is_editor = request.user.is_superuser or request.user.groups.filter(name="Editor").exists()
 
     if not is_editor:
         return JsonResponse({"message": "Permission denied."}, status=403)

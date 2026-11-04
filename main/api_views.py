@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from main.models import Experience
-from main.permissions import IsPortfolioOwnerOrReadOnly
+from main.permissions import IsPortfolioOwnerOrReadOnly, IsPortfolioOwnerOrEditorOrReadOnly
 from main.serializers import ExperienceSerializer
 
 
