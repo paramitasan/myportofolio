@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "main",
+    "rest_framework",
 ]
 
 CRSF_TRUSTED_ORIGINS = ["https://paramita-santoso-myportofolio.pws.cs.ui.ac.id"]
