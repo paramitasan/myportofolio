@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
 ]
 
-CRSF_TRUSTED_ORIGINS = ["https://paramita-santoso-myportofolio.pws.cs.ui.ac.id"]
+CSRF_TRUSTED_ORIGINS = ["https://paramita-santoso-myportofolio.pws.cs.ui.ac.id"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
