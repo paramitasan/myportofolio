@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from main.forms import ExperienceForm, EducationForm
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
 import datetime
 
 def show_main(request):
@@ -59,6 +60,7 @@ def get_experience_json(request):
 
     return JsonResponse(data, safe=False)
 
+@ensure_csrf_cookie
 def show_experience(request):
     title_query = request.GET.get("title", "").strip()
 
@@ -188,6 +190,7 @@ def get_education_json(request):
         })
     return JsonResponse(data, safe=False)
 
+@ensure_csrf_cookie
 def show_education(request):
     institution_name_query = request.GET.get("institution_name", "").strip()
 
