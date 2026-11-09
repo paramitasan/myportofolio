@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from main.models import Experience
+from main.models import Experience, Education
 
 
 class ExperienceAPITest(APITestCase):
@@ -142,3 +142,183 @@ class ExperienceAPITest(APITestCase):
             self.list_url, self.payload, format="json", HTTP_X_CSRFTOKEN=token,
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+class EducationAPITests(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_superuser("owner", password="pass12345")
+        self.editor = User.objects.create_user("editor", password="pass12345")
+        self.editor.groups.add(Group.objects.create(name="Editor"))
+        self.regular = User.objects.create_user("regular", password="pass12345")
+
+        self.record = Education.objects.create(
+            institution_name="Universitas Indonesia",
+            starting_year=2025,
+            description="Original",
+        )
+        self.list_url = reverse("api:education-list")
+        self.detail_url = reverse("api:education-detail", args=[self.record.id])
+        self.star_url = reverse("api:education-star", args=[self.record.id])
+        self.valid = {
+            "institution_name": "ITB",
+            "starting_year": 2020,
+            "end_year": 2024,
+            "description": "Robotics club",
+        }
+
+    # ---------- helpers ----------
+    def assert_all_writes_rejected(self):
+        self.assertEqual(self.client.post(self.list_url, self.valid, format="json").status_code, 403)
+        self.assertEqual(
+            self.client.patch(self.detail_url, {"description": "Hacked"}, format="json").status_code, 403)
+        self.assertEqual(
+            self.client.put(self.detail_url, self.valid, format="json").status_code, 403)
+        self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
+
+        self.assertEqual(Education.objects.count(), 1)
+        self.record.refresh_from_db()
+        self.assertEqual(self.record.description, "Original")
+        self.assertEqual(self.record.institution_name, "Universitas Indonesia")
+
+    # ---------- visitor ----------
+    def test_visitor_can_read_list_and_detail(self):
+        self.assertEqual(self.client.get(self.list_url).status_code, 200)
+        self.assertEqual(self.client.get(self.detail_url).status_code, 200)
+
+    def test_visitor_cannot_write(self):
+        self.assert_all_writes_rejected()
+
+    # ---------- regular user ----------
+    def test_regular_user_cannot_write(self):
+        self.client.force_authenticate(self.regular)
+        self.assert_all_writes_rejected()
+
+    # ---------- editor ----------
+    def test_editor_can_patch_but_not_create_or_delete(self):
+        self.client.force_authenticate(self.editor)
+
+        response = self.client.patch(self.detail_url, {"description": "Edited"}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.record.refresh_from_db()
+        self.assertEqual(self.record.description, "Edited")
+
+        self.assertEqual(self.client.post(self.list_url, self.valid, format="json").status_code, 403)
+        self.assertEqual(Education.objects.count(), 1)
+
+        self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
+        self.assertTrue(Education.objects.filter(pk=self.record.pk).exists())
+
+    # ---------- owner ----------
+    def test_owner_can_create_update_and_delete(self):
+        self.client.force_authenticate(self.owner)
+
+        response = self.client.post(self.list_url, self.valid, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Education.objects.count(), 2)
+
+        response = self.client.put(self.detail_url, self.valid, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.record.refresh_from_db()
+        self.assertEqual(self.record.institution_name, "ITB")
+
+        self.assertEqual(self.client.delete(self.detail_url).status_code, 204)
+        self.assertFalse(Education.objects.filter(pk=self.record.pk).exists())
+
+    def test_missing_record_returns_404(self):
+        url = reverse("api:education-detail", args=[uuid.uuid4()])
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+    # ---------- validation ----------
+    def test_year_below_2010_is_rejected(self):
+        self.client.force_authenticate(self.owner)
+        data = {**self.valid, "starting_year": 2009}
+        response = self.client.post(self.list_url, data, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("starting_year", response.data)
+        self.assertEqual(Education.objects.count(), 1)
+
+    def test_end_year_before_start_year_is_rejected(self):
+        self.client.force_authenticate(self.owner)
+        data = {**self.valid, "starting_year": 2024, "end_year": 2020}
+        response = self.client.post(self.list_url, data, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Education.objects.count(), 1)
+
+    def test_end_year_is_optional(self):
+        self.client.force_authenticate(self.owner)
+        data = {**self.valid, "end_year": None}
+        self.assertEqual(self.client.post(self.list_url, data, format="json").status_code, 201)
+
+    def test_html_is_stripped_from_text(self):
+        self.client.force_authenticate(self.owner)
+        data = {**self.valid,
+                "institution_name": "<b>ITB</b>",
+                "description": "<script>alert(1)</script>Club"}
+        response = self.client.post(self.list_url, data, format="json")
+        self.assertEqual(response.status_code, 201)
+        saved = Education.objects.get(pk=response.data["id"])
+        self.assertEqual(saved.institution_name, "ITB")
+        self.assertNotIn("<", saved.description)
+
+    def test_name_with_only_html_is_rejected(self):
+        self.client.force_authenticate(self.owner)
+        data = {**self.valid, "institution_name": "<b></b>"}
+        response = self.client.post(self.list_url, data, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Education.objects.count(), 1)
+
+    # ---------- search ----------
+    def test_search_filters_by_institution_name(self):
+        Education.objects.create(institution_name="ITB", starting_year=2020, description="x")
+        response = self.client.get(self.list_url, {"institution_name": "itb"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["institution_name"], "ITB")
+
+    # ---------- star ----------
+    def test_visitor_cannot_star(self):
+        self.assertEqual(self.client.post(self.star_url).status_code, 403)
+        self.assertEqual(self.record.starred_by.count(), 0)
+
+    def test_regular_user_can_star_and_unstar(self):
+        self.client.force_authenticate(self.regular)
+
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["star_count"], 1)
+        self.assertTrue(response.data["is_starred"])
+        self.assertIn(self.regular, self.record.starred_by.all())
+
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.data["star_count"], 0)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(self.record.starred_by.count(), 0)
+
+    def test_star_always_uses_request_user(self):
+        self.client.force_authenticate(self.regular)
+        self.client.post(self.star_url, {"user": self.owner.pk}, format="json")
+        self.assertEqual(list(self.record.starred_by.all()), [self.regular])
+
+
+class EducationCSRFTests(APITestCase):
+    def setUp(self):
+        self.owner = User.objects.create_superuser("owner", password="pass12345")
+        self.list_url = reverse("api:education-list")
+        self.data = {
+            "institution_name": "ITB", "starting_year": 2020,
+            "end_year": None, "description": "Club",
+        }
+        self.client = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(self.client.login(username="owner", password="pass12345"))
+
+    def test_write_without_csrf_token_is_rejected(self):
+        response = self.client.post(self.list_url, self.data, format="json")
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Education.objects.count(), 0)
+
+    def test_write_with_csrf_token_succeeds(self):
+        self.client.get(reverse("main:show_education"))   # sets cookie via @ensure_csrf_cookie
+        token = self.client.cookies["csrftoken"].value
+        response = self.client.post(
+            self.list_url, self.data, format="json", HTTP_X_CSRFTOKEN=token)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Education.objects.count(), 1)
