@@ -48,6 +48,48 @@ This project is a portofolio website which displays my academic profile, experie
 <br>
 
 ---
+### Week 6 - 09 Nov 2026
+- Django REST Framework implementation on Education and Experience page <br>
+
+###### Reflection
+1. 
+    REST stands for Representational State Transfer. It is an architectural style for building web services where a client communicates with a server using standard HTTP methods to view or change resource state. <br>
+    Returning JSON simply means formatting data in JSON. An API is only RESTful if it follows REST principles: using proper resource-based URLs (like `/api/experiences/`), standard HTTP methods (GET, POST, PUT, DELETE), consistent status codes (like 200 OK or 404 Not Found), and stateless communication.<br>
+    PUT vs PATCH:
+    - PUT (full replacement): Replaces the entire resource. All fields in the payload must be sent; omitted fields are usually wiped or reset to defaults.
+    - PATCH (partial update): Updates only the specific fields provided in the request body, leaving all other fields unchanged.
+2. 
+    A serializer in Django REST Framework acts as a two-way translator:
+    - Serialization: Converts complex Django objects (like Model instances or querysets) into native Python data types that easily turn into JSON.
+    - Deserialization: Converts incoming JSON payloads back into validated Python data types to create or update database records.<br>
+
+    Advantages over manual dictionaries with `JsonResponse`:
+    - Automatic Data Validation: Serializers validate field types, non-nullable rules, and custom data constraints automatically (`serializer.is_valid()`) before saving to the database. JsonResponse requires writing manual if/else validation checks for every field.
+    - Two-Way Data Flow: JsonResponse only handles outgoing data. Serializers handle both outputting JSON and saving incoming data (`serializer.save()`).
+    - Model Integration: ModelSerializer automatically generates input fields and validation rules directly from your Django models, eliminating repetitive boilerplate code.
+    - Built-in Security: Serializers make it easy to sanitize input (e.g., stripping dangerous HTML tags).
+3. 
+    Authentication vs authorization:
+    - Authentication: Answers "Who are you?"
+    It verifies the user's identity (e.g., logging in with a username and password).
+    - Authorization: Answers "What are you allowed to do?"
+    It checks whether an authenticated user has permission to perform a specific action (e.g., checking if a user is in the Editor group before allowing an edit).
+    
+    - Access rights have to be checked with a permission class on the server because hiding a button in an HTML template only alters the visual user interface. It does not block backend endpoints. Any user can inspect the page, extract the API URL, and send a raw HTTP request (using tools like fetch) directly to the server. Server-side permission classes ensure that unauthorized requests are rejected with a 403 Forbidden error regardless of where the request originated.
+4. CSRF tokens are necessary because it guarantees that data-changing requests (POST, PUT, DELETE, PATCH) come from actual frontend application rather than a third-party site. 
+    - DRF's `force_authenticate` test method explicitly bypasses both the authentication backend and CSRF validation checks to let us test view logic under a mock user context. Passing a test with `force_authenticate` does not prove that our API correctly enforces CSRF protection for real browser sessions.<br>
+
+###### AI Disclosure
+I used Claude Sonnet 5.5 and Gemini to help me check my code, fix flawed logic, give suggestions, debug errors, and make test cases. I also used them to explain certain parts of the code to deepen my understanding.
+
+- Prompts:
+    - Has the fields in serializer match my model? Has the validate checked the necessary fields?
+    - Are these functions correct already? point out the parts where bugs exist.
+    - I found a bug. Could you tell me why this error occurs and tell me how to solve it? Point out some potential bugs if they exist, and how to fix them as well.
+- AI's Limitation & Manual Fix:
+    - As the AI doesn't get full context of my code, it offers redundant/unmatching code solutions. Thus, I had to crosscheck between my code and suggested code so that there are no duplicates or mismatched variables.
+
+---
 ### Week 5 - 05 Oct 2026
 - Implemented toast notification (success messages, informative error messages)
 - Created modal form for adding new Experience and Education record
