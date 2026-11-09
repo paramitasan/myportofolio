@@ -61,3 +61,8 @@ class Education(models.Model):
     starred_by = models.ManyToManyField(
         User, related_name="starred_education", blank=True
     )
+
+    def clean(self):
+        super().clean()
+        if self.starting_year and self.end_year and self.end_year < self.starting_year:
+            raise ValidationError({"end_year": "End year can't be before the starting year."})

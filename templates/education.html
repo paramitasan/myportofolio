@@ -117,7 +117,7 @@
 
         const endYearText = edu.end_year ? edu.end_year : 'Present';
         const yearsHtml = (edu.starting_year || edu.end_year) 
-            ? `<span class="education-year">${edu.starting_year || ''} — ${endYearText}</span>` 
+            ? `<span class="education-year">${escapeHtml(edu.starting_year)} — ${escapeHtml(endYearText)}</span>` 
             : '';
 
         const starTitle = edu.star_count > 0 
@@ -139,7 +139,7 @@
             : `<a href="{% url 'main:login' %}" class="button">Login to star (${edu.star_count})</a>`;
 
         const editHtml = IS_EDITOR 
-            ? `<a href="${educationEndpoint(EDIT_EDUCATION_ENDPOINT, edu.id)}" class="button button-secondary-edit">Edit</a>` 
+            ? `<a href="${educationEndpoint(EDIT_EDUCATION_ENDPOINT, escapeHtml(edu.id))}" class="button button-secondary-edit">Edit</a>` 
             : '';
 
         const deleteHtml = IS_SUPERUSER 
@@ -269,27 +269,23 @@
         submitButton.disabled = true;
 
         try {
-            const response = await fetch(CREATE_EDUCATION_ENDPOINT, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                body: new FormData(educationForm),
-            });
-            const result = await response.json().catch(() => ({}));
+            const fields = new FormData(educationForm);
+            const payload = {
+                institution_name: fields.get('institution_name'),
+                starting_year: fields.get('starting_year') || null,
+                end_year: fields.get('end_year') || null,   
+                description: fields.get('description'),
+            };
 
-            if (response.ok) {
-                educationForm.reset();
-                closeEducationModal();
-                showToast('Success', 'Education record has been added successfully!', 'success');
-                fetchEducation(searchInput.value.trim());
-            } else {
-                const errorMessages = result.errors
-                    ? Object.values(result.errors).flat().map(error => error.message)
-                    : [result.message || `Something went wrong (status ${response.status}).`];
-                showToast('Failed to add education record', errorMessages.join(' '), 'error');
-            }
+            await writeEducation(BASE_EDUCATION_ENDPOINT, 'POST', payload);
+
+            educationForm.reset();
+            closeEducationModal();
+            showToast('Success', 'Education record has been added successfully!', 'success');
+            fetchEducation(searchInput.value.trim());
         } catch (error) {
             console.error('Error adding record:', error);
-            showToast('Failed to add education record', 'Could not reach the server. Please try again.', 'error');
+            showToast('Failed to add education record', error.message, 'error');
         } finally {
             submitButton.disabled = false;
         }

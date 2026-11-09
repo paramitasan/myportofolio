@@ -74,11 +74,11 @@ class EducationSerializer(serializers.ModelSerializer):
         return strip_tags(value).strip()
 
     def validate(self, attrs):
-        started = attrs.get("started_at", getattr(self.instance, "started_at", None))
-        ended = attrs.get("ended_at", getattr(self.instance, "ended_at", None))
-        if started and ended and ended <= started:
+        start = attrs.get("starting_year", getattr(self.instance, "starting_year", None))
+        end = attrs.get("end_year", getattr(self.instance, "end_year", None))
+        if start and end and end < start:
             raise serializers.ValidationError(
-                {"ended_at": "End date must be after the start date."}
+                {"end_year": "End year can't be before the starting year."}
             )
         return attrs
     
