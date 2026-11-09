@@ -134,7 +134,7 @@
             : `<a href="{% url 'main:login' %}" class="button">Login to star (${exp.star_count})</a>`;
 
         const editHtml = IS_EDITOR
-            ? `<a href="${experienceEndpoint(EDIT_EXPERIENCE_ENDPOINT, exp.id)}" class="button button-secondary">Edit</a>`
+            ? `<a href="${experienceEndpoint(EDIT_EXPERIENCE_ENDPOINT, exp.id)}" class="button button-secondary-edit">Edit</a>`
             : '';
 
         const deleteHtml = IS_SUPERUSER 
@@ -270,7 +270,7 @@
             const fields = new FormData(experienceForm);
             const payload = Object.fromEntries([
                 'title', 'description', 'category', 'thumbnail', 'started_at', 'ended_at',
-            ].map(name => [name, fields.get(name)]));
+            ].map(name => [name, fields.get(name) || null]));
 
             await writeExperience(BASE_EXPERIENCE_ENDPOINT, 'POST', payload);
 

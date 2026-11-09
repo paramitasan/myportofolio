@@ -50,7 +50,7 @@ def get_experience_json(request):
                 "category": exp.category,
                 "thumbnail": exp.thumbnail,
                 "started_at": exp.started_at.isoformat() if exp.started_at else False,
-                "ended_at": exp.ended_at.isoformat() if exp.ended_at else False,
+                "ended_at": exp.ended_at.isoformat() if exp.ended_at else None,
                 "star_count": starred_users.count(),
                 "is_starred": is_starred,
                 "starred_by_names": starred_by_names,

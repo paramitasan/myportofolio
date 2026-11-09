@@ -26,7 +26,17 @@ class ExperienceSerializer(serializers.ModelSerializer):
         return value
 
     def validate_description(self, value):
+        value = strip_tags(value).strip()
         return strip_tags(value)
+
+    def validate(self, attrs):
+        started = attrs.get("started_at", getattr(self.instance, "started_at", None))
+        ended = attrs.get("ended_at", getattr(self.instance, "ended_at", None))
+        if started and ended and ended <= started:
+            raise serializers.ValidationError(
+                {"ended_at": "End date must be after the start date."}
+            )
+        return attrs
 
     def get_star_count(self, obj):
         return obj.starred_by.count()
