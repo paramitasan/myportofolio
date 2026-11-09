@@ -7,9 +7,9 @@ from rest_framework.decorators import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from main.models import Experience
+from main.models import Experience, Education
 from main.permissions import IsPortfolioOwnerOrEditorOrReadOnly
-from main.serializers import ExperienceSerializer
+from main.serializers import ExperienceSerializer, EducationSerializer
 
 
 @api_view(["GET", "HEAD", "POST"])
@@ -65,3 +65,23 @@ def experience_star(request, experience_id):
         experience.starred_by.add(request.user)
     serializer = ExperienceSerializer(experience, context={"request": request})
     return Response(serializer.data)
+
+
+@api_view(["GET", "HEAD", "POST"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
+def education_list(request):
+    if request.method in ("GET", "HEAD"):
+        education = Education.objects.prefetch_related("starred_by").order_by("institution_name", "id")
+        institution_name = request.query_params.get("institution_name", "").strip()
+        if institution_name:
+            education = education.filter(institution_name__icontains=institution_name)
+        serializer = EducationSerializer(
+            education, many=True, context={"request": request},
+        )
+        return Response(serializer.data)
+
+    serializer = EducationSerializer(data=request.data, context={"request": request})
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
